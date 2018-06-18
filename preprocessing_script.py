@@ -31,32 +31,56 @@ def mb(img, size):
     return blur
 
 # Gaussian blurring
-#def gb(img, size):
-#    blur = cv2.GaussianBlur(img, (size, size), 0)
-#    return blur
+def gb(img, size):
+    blur = cv2.GaussianBlur(img, (size, size), 0)
+    return blur
+
+# Grayscale denoising using non-local means denoising algorithm
+def nmda(img, h, size1, size2):
+    dst = cv2.fastNlMeansDenoising(img, None, h, size1, size2)
+    return dst
+
+# mask
+def Mor_mask(img, gray, size1, size2):
+    se1 = cv2.getStructuringElement(cv2.MORPH_RECT, (size1, size1))
+    se2 = cv2.getStructuringElement(cv2.MORPH_RECT, (size2, size2))
+    mask = cv2.morphologyEx(gray, cv2.MORPH_CLOSE, se1)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, se2)
+
+    mask = np.dstack([mask, mask, mask]) / 255
+    output = img * mask
+    return output
+
+# bilateral filter
+def bil(img, filter_size, sigma):
+    blur = cv2.bilateralFilter(img,filter_size,sigma,sigma)
+    return blur
 
 # check the images
 if args["image"] == "invoice.tif":
-    gray = mb(gray, 3)
-    output = Morphology(gray, 2)
-    cv2.imwrite("denoised_invoice.tif", output)
+    #gray = bil(gray, 9, 75)
+    gray = gb(gray, 3)
+    #gray = Morphology(gray, 2)
+    #output = nmda(gray, 10, 7, 21)
+    #output = Mor_mask(img, gray, 5, 2)
+    output = bil(gray, 5, 75)
+    cv2.imwrite("denoised_{}".format(args["image"]), output)
     cv2.imshow("Image", img)
     cv2.imshow("Output1",output)
     cv2.waitKey(0)
 
-elif args["image"] == "GE.tif" or "Gibson.tif":
+elif args["image"] == "GE.tif":
     output = mb(gray, 3)
     cv2.imwrite("denoised_{}".format(args["image"]), output)
     cv2.imshow("Image", img)
     cv2.imshow("Output2", output)
     cv2.waitKey(0)
-"""
+
 elif args["image"] == "Gibson.tif":
-    output = gb(gray, 5) # for this image, Gaussian Blurring may be used
-    cv2.imwrite("denoised_Gibson.tif", output)
+    output = gb(gray, 5)
+    cv2.imwrite("denoised_{}".format(args["image"]), output)
     cv2.imshow("Image", img)
     cv2.imshow("Output3", output)
     cv2.waitKey(0)
-"""
     
                     
