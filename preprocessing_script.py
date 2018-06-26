@@ -56,7 +56,7 @@ def bil(img, filter_size, sigma):
     blur = cv2.bilateralFilter(img,filter_size,sigma,sigma)
     return blur
 
-# check the images
+# check different images based on the args
 if args["image"] == "invoice.tif":
     #gray = bil(gray, 9, 75)
     gray = gb(gray, 3)
